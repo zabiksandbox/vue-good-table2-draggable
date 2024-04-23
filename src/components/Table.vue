@@ -155,8 +155,9 @@
 
           <!-- Table body starts here -->
           <draggable
-            v-model="paginated[0].children"
+            :list="paginated[0].children"
             tag="tbody"
+            @end="onDragEnd"
            >
           <!--<tbody
             v-for="(headerRow, index) in paginated"
@@ -164,7 +165,6 @@
           >-->
             <!-- normal rows here. we loop over all rows -->
             <tr
-              v-if="groupOptions.collapsable ? headerRow.vgtIsExpanded : true"
               v-for="(row, index) in paginated[0].children"
               :key="row.originalIndex"
               :class="getRowStyleClass(row)"
@@ -1088,26 +1088,17 @@ export default {
         event,
       });
     },
+    onDragEnd(event, arg2){
+        console.log('onDragOver')
+        console.log(event.oldIndex)
+        console.log(event.newIndex)
+        let elem = this.rows[event.oldIndex]
+        console.log(elem);
+        console.log(this.rows)
+        this.rows.splice(event.oldIndex, 1);
+        this.rows.splice(event.newIndex, 0, elem);
+        console.log(this.rows)
 
-    onRowStartDrag(row, index, event) {
-      event.dataTransfer.dropEffect = 'move'
-      event.dataTransfer.effectAllowed = 'move'
-      event.dataTransfer.setData("text/plain", event.target.innerText);
-      event.dataTransfer.setData("text/html", event.target.outerHTML);
-    },
-    onDrop(event) {
-      console.log('onDrop')
-      console.log(event)
-    },
-    onDragOver(event) {
-      console.log('onDragOver')
-      console.log(event)
-      return true;
-    },
-    onDragEnter(event) {
-      console.log('onDragEnter')
-      console.log(event)
-      return true;
     },
     onCellClicked(row, column, rowIndex, event) {
       this.$emit('on-cell-click', {
