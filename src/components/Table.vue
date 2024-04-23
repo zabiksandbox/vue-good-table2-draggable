@@ -152,54 +152,28 @@
             </template>
           </thead>
 
+
           <!-- Table body starts here -->
-          <tbody
+          <draggable
+            v-model="paginated[0].children"
+            tag="tbody"
+           >
+          <!--<tbody
             v-for="(headerRow, index) in paginated"
             :key="index"
-          >
-            <!-- if group row header is at the top -->
-            <vgt-header-row
-              v-if="groupHeaderOnTop"
-              @vgtExpand="toggleExpand(headerRow[rowKeyField])"
-              :header-row="headerRow"
-              :columns="columns"
-              :line-numbers="lineNumbers"
-              :selectable="selectable"
-              :select-all-by-group="selectAllByGroup"
-              :collapsable="groupOptions.collapsable"
-              :collect-formatted="collectFormatted"
-              :formatted-row="formattedRow"
-              :class="getRowStyleClass(headerRow)"
-              :get-classes="getClasses"
-              :full-colspan="fullColspan"
-              :groupIndex="index"
-              @on-select-group-change="toggleSelectGroup($event, headerRow)"
-            >
-              <template
-                v-if="hasHeaderRowTemplate"
-                slot="table-header-row"
-                slot-scope="props"
-              >
-                <slot
-                  name="table-header-row"
-                  :column="props.column"
-                  :formattedRow="props.formattedRow"
-                  :row="props.row"
-                >
-                </slot>
-              </template>
-            </vgt-header-row>
+          >-->
             <!-- normal rows here. we loop over all rows -->
             <tr
               v-if="groupOptions.collapsable ? headerRow.vgtIsExpanded : true"
-              v-for="(row, index) in headerRow.children"
+              v-for="(row, index) in paginated[0].children"
               :key="row.originalIndex"
               :class="getRowStyleClass(row)"
               @mouseenter="onMouseenter(row, index)"
               @mouseleave="onMouseleave(row, index)"
               @dblclick="onRowDoubleClicked(row, index, $event)"
               @click="onRowClicked(row, index, $event)"
-              @auxclick="onRowAuxClicked(row, index, $event)">
+              @auxclick="onRowAuxClicked(row, index, $event)"
+              >
               <th
                 v-if="lineNumbers"
                 class="line-numbers"
@@ -243,35 +217,7 @@
               </td>
             </tr>
             <!-- if group row header is at the bottom -->
-            <vgt-header-row
-              v-if="groupHeaderOnBottom"
-              :header-row="headerRow"
-              :columns="columns"
-              :line-numbers="lineNumbers"
-              :selectable="selectable"
-              :select-all-by-group="selectAllByGroup"
-              :collect-formatted="collectFormatted"
-              :formatted-row="formattedRow"
-              :get-classes="getClasses"
-              :full-colspan="fullColspan"
-              :groupIndex="index"
-              @on-select-group-change="toggleSelectGroup($event, headerRow)"
-            >
-              <template
-                v-if="hasHeaderRowTemplate"
-                slot="table-header-row"
-                slot-scope="props"
-              >
-                <slot
-                  name="table-header-row"
-                  :column="props.column"
-                  :formattedRow="props.formattedRow"
-                  :row="props.row"
-                >
-                </slot>
-              </template>
-            </vgt-header-row>
-          </tbody>
+          </draggable>
 
           <tbody v-if="showEmptySlot">
             <tr>
@@ -334,6 +280,7 @@ import VgtHeaderRow from './VgtHeaderRow.vue';
 
 // here we load each data type module.
 import * as CoreDataTypes from './types/index';
+import draggable from 'vuedraggable'
 
 const dataTypes = {};
 const coreDataTypes = CoreDataTypes.default;
@@ -343,7 +290,7 @@ each(Object.keys(coreDataTypes), (key) => {
 });
 
 export default {
-  name: 'vue-good-table',
+  name: 'vue-good-table2-draggable',
   props: {
     isLoading: { default: null, type: Boolean },
     maxHeight: { default: null, type: String },
@@ -359,7 +306,7 @@ export default {
     rtl: Boolean,
     rowStyleClass: { default: null, type: [Function, String] },
     compactMode: Boolean,
-
+    draggable: { default: false , type: Boolean },
     groupOptions: {
       default() {
         return {
@@ -1142,6 +1089,26 @@ export default {
       });
     },
 
+    onRowStartDrag(row, index, event) {
+      event.dataTransfer.dropEffect = 'move'
+      event.dataTransfer.effectAllowed = 'move'
+      event.dataTransfer.setData("text/plain", event.target.innerText);
+      event.dataTransfer.setData("text/html", event.target.outerHTML);
+    },
+    onDrop(event) {
+      console.log('onDrop')
+      console.log(event)
+    },
+    onDragOver(event) {
+      console.log('onDragOver')
+      console.log(event)
+      return true;
+    },
+    onDragEnter(event) {
+      console.log('onDragEnter')
+      console.log(event)
+      return true;
+    },
     onCellClicked(row, column, rowIndex, event) {
       this.$emit('on-cell-click', {
         row,
@@ -1150,7 +1117,6 @@ export default {
         event,
       });
     },
-
     onMouseenter(row, index) {
       this.$emit('on-row-mouseenter', {
         row,
@@ -1582,6 +1548,7 @@ export default {
     'vgt-global-search': VgtGlobalSearch,
     'vgt-header-row': VgtHeaderRow,
     'vgt-table-header': VgtTableHeader,
+    draggable: draggable,
   },
 };
 </script>
