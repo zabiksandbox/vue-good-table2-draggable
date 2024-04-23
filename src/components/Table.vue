@@ -306,7 +306,6 @@ export default {
     rtl: Boolean,
     rowStyleClass: { default: null, type: [Function, String] },
     compactMode: Boolean,
-    draggable: { default: false , type: Boolean },
     groupOptions: {
       default() {
         return {
@@ -1089,16 +1088,10 @@ export default {
       });
     },
     onDragEnd(event, arg2){
-        console.log('onDragOver')
-        console.log(event.oldIndex)
-        console.log(event.newIndex)
         let elem = this.rows[event.oldIndex]
-        console.log(elem);
-        console.log(this.rows)
         this.rows.splice(event.oldIndex, 1);
         this.rows.splice(event.newIndex, 0, elem);
-        console.log(this.rows)
-
+        this.$emit('on-drag-end', true);
     },
     onCellClicked(row, column, rowIndex, event) {
       this.$emit('on-cell-click', {
