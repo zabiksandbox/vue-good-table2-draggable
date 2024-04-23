@@ -158,6 +158,7 @@
             :list="paginated[0].children"
             tag="tbody"
             @end="onDragEnd"
+            :move="onMove"
            >
           <!--<tbody
             v-for="(headerRow, index) in paginated"
@@ -1093,6 +1094,12 @@ export default {
         this.rows.splice(event.newIndex, 0, elem);
         this.$emit('on-drag-end', true);
     },
+    onMove(eventData) {
+        if (eventData.draggedContext.element.dragging == false) {
+            return false;
+        }
+        return true;
+    },
     onCellClicked(row, column, rowIndex, event) {
       this.$emit('on-cell-click', {
         row,
@@ -1304,7 +1311,6 @@ export default {
     getCurrentIndex(index) {
       return ((this.currentPage - 1) * this.currentPerPage) + index + 1;
     },
-
     getRowStyleClass(row) {
       let classes = '';
       if (this.hasRowClickListener) classes += 'clickable';
