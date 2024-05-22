@@ -159,6 +159,7 @@
             tag="tbody"
             @end="onDragEnd"
             :move="onMove"
+            @start="onDragStart"
            >
           <!--<tbody
             v-for="(headerRow, index) in paginated"
@@ -1094,8 +1095,11 @@ export default {
         this.rows.splice(event.newIndex, 0, elem);
         this.$emit('on-drag-end', true);
     },
+    onDragStart(event) {
+        this.$emit('on-drag-start', event);
+    },
     onMove(eventData) {
-        if (eventData.draggedContext.element.dragging == false) {
+        if (eventData.draggedContext.element.draggable == false) {
             return false;
         }
         return true;
